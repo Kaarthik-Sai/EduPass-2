@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const { User } = require("./models");
 const { ROLES } = require("./config/constants");
 
-const PASSWORD = process.env.SEED_USER_PASSWORD;
+const PASSWORD = "Edupass@123";
 const users = [
   { loginId: "ADMIN001", name: "Admin", role: ROLES.ADMIN },
   { loginId: "HODCSE", name: "CSE HOD", role: ROLES.HOD },

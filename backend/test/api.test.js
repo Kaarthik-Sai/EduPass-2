@@ -1,4 +1,5 @@
 process.env.NODE_ENV = 'test';
+process.env.JWT_SECRET = 'test-only-secret-that-is-not-used-in-production';
 const { test, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const app = require('../app');
@@ -23,6 +24,18 @@ test('protected categories endpoint rejects anonymous requests', async () => {
   const response = await fetch(`${base}/categories`);
   assert.equal(response.status, 401);
   assert.equal((await response.json()).success, false);
+});
+
+test('protected endpoint rejects malformed authorization headers', async () => {
+  const response = await fetch(`${base}/categories`, { headers: { authorization: 'Basic not-a-bearer-token' } });
+  assert.equal(response.status, 401);
+  assert.equal((await response.json()).message, 'Invalid authorization format');
+});
+
+test('protected endpoint verifies a Bearer token instead of treating it as missing', async () => {
+  const response = await fetch(`${base}/categories`, { headers: { authorization: 'bEaReR invalid-token' } });
+  assert.equal(response.status, 401);
+  assert.equal((await response.json()).message, 'Invalid or expired token');
 });
 
 test('login validates required credentials before querying MongoDB', async () => {

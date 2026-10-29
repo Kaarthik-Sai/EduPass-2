@@ -38,7 +38,18 @@ function App() {
       .finally(() => setBusy(false));
   };
   useEffect(restoreSession, []);
+  useEffect(() => {
+    const expireSession = () => {
+      setSession(null);
+      setRestoreError("");
+    };
+    window.addEventListener("edupass:auth-expired", expireSession);
+    return () => window.removeEventListener("edupass:auth-expired", expireSession);
+  }, []);
   const signIn = (d) => {
+    if (typeof d.token !== "string" || !d.token.trim()) {
+      throw new Error("Login response did not include a session token");
+    }
     localStorage.setItem("edupass_token", d.token);
     setSession(d);
   };
